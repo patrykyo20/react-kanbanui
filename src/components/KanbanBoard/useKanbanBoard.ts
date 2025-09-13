@@ -67,32 +67,67 @@ export const useKanbanBoard = (
     const rect = dropZone.getBoundingClientRect();
     const y = event.clientY - rect.top;
 
-    const cardElements = dropZone.querySelectorAll("[data-card-id]");
+    const cardElements = Array.from(dropZone.querySelectorAll("[data-card-id]"))
+      .filter((element) => {
+        const cardId = (element as HTMLElement).dataset.cardId;
+        return cardId && cardId !== dragCard?.id && !cardId.endsWith("-ghost");
+      });
+
     let insertIndex = cards.length;
 
     console.log(
       `🔍 Calculating drop position: y=${y}, cards.length=${cards.length}, cardElements.length=${cardElements.length}`
     );
 
+    if (cardElements.length === 0) {
+      console.log(`🎯 No cards in column, inserting at position 0`);
+      return 0;
+    }
+
     for (let i = 0; i < cardElements.length; i++) {
       const cardElement = cardElements[i] as HTMLElement;
       const cardRect = cardElement.getBoundingClientRect();
       const cardTop = cardRect.top - rect.top;
-      const cardMiddle = cardTop + cardRect.height / 2;
-
+      const cardBottom = cardTop + cardRect.height;
+      const cardMiddle = cardTop + (cardRect.height / 2);
+      
       console.log(
-        `🔍 Card ${i}: top=${cardTop}, middle=${cardMiddle}, y=${y}, y < middle=${
-          y < cardMiddle
-        }`
+        `🔍 Card ${i}: top=${cardTop}, middle=${cardMiddle}, bottom=${cardBottom}, y=${y}`
       );
 
+      // Logika drop zones:
+      // 1. Jeśli mysz jest w górnej części karty (przed środkiem) -> wstaw PRZED kartą
       if (y < cardMiddle) {
+        console.log(`🎯 Dropping BEFORE card ${i} (y=${y} < middle=${cardMiddle})`);
         insertIndex = i;
         break;
       }
+      // 2. Jeśli to ostatnia karta i mysz jest poniżej środka -> wstaw PO ostatniej karcie
+      else if (i === cardElements.length - 1) {
+        console.log(`🎯 Dropping AFTER last card ${i} (y=${y} >= middle=${cardMiddle})`);
+        insertIndex = i + 1;
+        break;
+      }
+      // 3. Dla kart środkowych, sprawdź czy mysz jest między środkiem tej karty a środkiem następnej
+      else if (i < cardElements.length - 1) {
+        const nextCardElement = cardElements[i + 1] as HTMLElement;
+        const nextCardRect = nextCardElement.getBoundingClientRect();
+        const nextCardTop = nextCardRect.top - rect.top;
+        const nextCardMiddle = nextCardTop + (nextCardRect.height / 2);
+        
+        // Jeśli mysz jest między środkiem obecnej karty a środkiem następnej karty
+        if (y >= cardMiddle && y < nextCardMiddle) {
+          console.log(`🎯 Dropping BETWEEN card ${i} and ${i + 1} (${cardMiddle} <= y=${y} < ${nextCardMiddle})`);
+          insertIndex = i + 1;
+          break;
+        }
+      }
     }
 
-    console.log(`🎯 Final insertIndex: ${insertIndex}`);
+    // Dla ostatniej pozycji, pozwól na wstawienie na końcu
+    // NIE ograniczaj do cards.length
+    console.log(`🎯 Final insertIndex: ${insertIndex} (cards.length: ${cards.length})`);
+    console.log(`🎯 Returning position for ${dragCard?.id}: ${insertIndex}`);
     return insertIndex;
   };
 
@@ -127,9 +162,12 @@ export const useKanbanBoard = (
 
     const position = calculateDropPosition(event, columnId);
     console.log(
-      `🎯 Drop position calculated: ${position} for column ${columnId}`
+      `🎯 Drop position calculated: ${position} for column ${columnId}, dragging card: ${dragCard?.id}`
     );
     setDropPosition({ columnId, position });
+    console.log(
+      `🎯 Drop position set: columnId=${columnId}, position=${position}`
+    );
   };
 
   const onDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
@@ -147,12 +185,15 @@ export const useKanbanBoard = (
   };
 
   const onDragEnd = () => {
+    console.log(`🏁 onDragEnd called - dragCard: ${dragCard?.id}, prevColumnId: ${prevColumnId}, dropPosition:`, dropPosition);
+    
     if (!dragCard) {
       console.warn("No drag card found");
       return;
     }
 
     if (!prevColumnId) {
+      console.warn("No previous column ID found");
       return;
     }
 
@@ -180,12 +221,18 @@ export const useKanbanBoard = (
         );
 
         console.log(
-          `🔄 Same column reorder: currentIndex=${currentIndex}, dropPosition=${dropPosition.position}`
+          `🔄 Same column reorder: currentIndex=${currentIndex}, dropPosition=${dropPosition.position}, totalCards=${sourceColumn.cards.length}`
         );
 
-        // Jeśli pozycja się nie zmieniła, anuluj operację
+        // Sprawdź czy to rzeczywiście jest zmiana pozycji
+        // Prosta logika: jeśli dropPosition jest różne od currentIndex, to jest zmiana
+        console.log(
+          `🔄 Checking position change: currentIndex=${currentIndex}, dropPosition=${dropPosition.position}`
+        );
+
+        // Anuluj tylko jeśli próbujemy upuścić kartę dokładnie w tym samym miejscu
         if (currentIndex === dropPosition.position) {
-          console.log("❌ Position unchanged, canceling operation");
+          console.log("❌ Dropping card in the same position, canceling operation");
           setDragCard(null);
           setPrevColumnId(null);
           setNextColumnId(null);
@@ -194,6 +241,8 @@ export const useKanbanBoard = (
           setDraggedCardId(null);
           return;
         }
+
+        console.log("✅ Position changed, proceeding with reorder");
       }
     }
 
@@ -209,7 +258,6 @@ export const useKanbanBoard = (
       return;
     }
 
-    // Sprawdź duplikaty tylko przy przenoszeniu między różnymi kolumnami
     if (prevColumnId !== dropPosition.columnId) {
       const cardExistsInTarget = targetColumn.cards.some(
         (card) => card.id === dragCard.id
@@ -244,15 +292,30 @@ export const useKanbanBoard = (
           if (currentIndex !== -1) {
             cards.splice(currentIndex, 1);
 
-            let targetIndex = dropPosition.position;
-            if (currentIndex < dropPosition.position) {
+            // Oblicz prawidłową pozycję docelową
+            let targetIndex;
+            
+            if (dropPosition.position >= cards.length) {
+              // Chcemy wstawić na koniec (po wszystkich kartach)
+              targetIndex = cards.length;
+            } else if (currentIndex < dropPosition.position) {
+              // Przesuwamy w dół - pozycja się przesuwa o 1 w lewo po usunięciu
               targetIndex = dropPosition.position - 1;
+            } else {
+              // Przesuwamy w górę - pozycja pozostaje ta sama
+              targetIndex = dropPosition.position;
             }
+            
+            // Zabezpieczenie przed przekroczeniem granic
+            targetIndex = Math.max(0, Math.min(targetIndex, cards.length));
 
             console.log(
-              `🎯 Reordering: currentIndex=${currentIndex}, dropPosition=${dropPosition.position}, targetIndex=${targetIndex}`
+              `🎯 Reordering: currentIndex=${currentIndex}, dropPosition=${dropPosition.position}, targetIndex=${targetIndex}, cards.length after removal=${cards.length}`
             );
             cards.splice(targetIndex, 0, dragCard);
+            console.log(
+              `🎯 After insertion: cards.length=${cards.length}, card at targetIndex=${targetIndex}:`, cards[targetIndex]?.id
+            );
           }
 
           return {
@@ -321,11 +384,22 @@ export const useKanbanBoard = (
           // Usuń kartę z obecnej pozycji
           const cardToMove = cards.splice(currentIndex, 1)[0];
 
-          // Wstaw kartę w nowej pozycji
-          let targetIndex = dropPosition.position;
-          if (currentIndex < dropPosition.position) {
+          // Wstaw kartę w nowej pozycji - użyj tej samej logiki co w onDragEnd
+          let targetIndex;
+          
+          if (dropPosition.position >= cards.length) {
+            // Chcemy wstawić na koniec (po wszystkich kartach)
+            targetIndex = cards.length;
+          } else if (currentIndex < dropPosition.position) {
+            // Przesuwamy w dół - pozycja się przesuwa o 1 w lewo po usunięciu
             targetIndex = dropPosition.position - 1;
+          } else {
+            // Przesuwamy w górę - pozycja pozostaje ta sama
+            targetIndex = dropPosition.position;
           }
+          
+          // Zabezpieczenie przed przekroczeniem granic
+          targetIndex = Math.max(0, Math.min(targetIndex, cards.length));
 
           cards.splice(targetIndex, 0, cardToMove);
         }
