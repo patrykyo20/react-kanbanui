@@ -1,0 +1,115 @@
+/* ✅ Drop zone styles for visual feedback */
+
+/* Drop zones on cards */
+
+.card-dragging {
+  opacity: 0.5 !important;
+  transition: all 0.3s ease-in-out !important;
+  z-index: 100 !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Cards that will move to make space */
+.card-moving-up {
+  animation: slideUp 0.4s ease-out !important;
+}
+
+.card-moving-down {
+  animation: slideDown 0.4s ease-out !important;
+}
+
+/* Card that will receive the dropped card */
+.card-receiving {
+  animation: pulse 0.3s ease-in-out !important;
+}
+
+/* ✅ Keyframe animations */
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  }
+}
+
+/* ✅ Smooth card reordering transitions */
+.kanban-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: transform, opacity !important;
+}
+
+/* Card entering new position */
+.card-entering {
+  animation: cardEnter 0.4s ease-out !important;
+}
+
+@keyframes cardEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Cards shifting to make space */
+.cards-shifting {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ✅ Enhanced hover effects during drag */
+.kanban-card:hover:not(.card-dragging) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.2s ease-out !important;
+}
+
+/* ✅ Column animation during drag over */
+.column-drag-over {
+  animation: columnPulse 0.6s ease-in-out infinite alternate !important;
+}
+
+@keyframes columnPulse {
+  0% {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+  }
+  100% {
+    transform: scale(1.02);
+    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.3);
+  }
+}

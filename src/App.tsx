@@ -1,35 +1,100 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { useState } from "react";
+import { KanbanBoard, IKanbanColumn } from "./components";
+
+const customColumns: IKanbanColumn[] = [
+  {
+    id: "col-1",
+    title: "To Do",
+    status: "todo",
+    cards: [
+      {
+        id: "card-1",
+        title: "Implement login",
+        description: "Create user authentication system",
+        priority: "high",
+        status: "todo",
+        assignee: "John Doe",
+        tags: ["frontend", "auth"],
+      },
+      {
+        id: "card-2",
+        title: "Design dashboard",
+        description: "Create admin dashboard layout",
+        priority: "medium",
+        status: "todo",
+        assignee: "Jane Smith",
+        tags: ["design", "ui"],
+      },
+    ],
+  },
+  {
+    id: "col-2",
+    title: "In Progress",
+    status: "in-progress",
+    cards: [
+      {
+        id: "card-3",
+        title: "API integration",
+        description: "Connect frontend with backend API",
+        priority: "high",
+        status: "in-progress",
+        assignee: "Mike Johnson",
+        tags: ["backend", "api"],
+      },
+    ],
+  },
+  {
+    id: "col-3",
+    title: "Review",
+    status: "review",
+    cards: [
+      {
+        id: "card-4",
+        title: "Unit tests",
+        description: "Write tests for components",
+        priority: "medium",
+        status: "review",
+        assignee: "Sarah Wilson",
+        tags: ["testing", "quality"],
+      },
+    ],
+  },
+  {
+    id: "col-4",
+    title: "Done",
+    status: "done",
+    cards: [
+      {
+        id: "card-5",
+        title: "Project setup",
+        description: "Initialize project structure",
+        priority: "low",
+        status: "done",
+        assignee: "John Doe",
+        tags: ["setup", "config"],
+      },
+    ],
+  },
+];
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [columns, setColumns] = useState<IKanbanColumn[]>(customColumns);
+
+  const handleColumnsChange = (newColumns: IKanbanColumn[]) => {
+    setColumns(newColumns);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <KanbanBoard
+        columns={columns}
+        useOwnStyles={false}
+        columnHeight="700px"
+        onColumnsChange={handleColumnsChange}
+      />
+    </div>
+  );
 }
 
-export default App
+export default App;
