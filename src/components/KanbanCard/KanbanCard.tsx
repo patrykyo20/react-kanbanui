@@ -13,6 +13,7 @@ interface KanbanCardProps {
   className?: string;
   testId?: string;
   useOwnStyles?: boolean;
+  theme?: "light" | "dark";
   onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
   onDragEnd?: (event: DragEvent<HTMLDivElement>) => void;
 }
@@ -25,6 +26,7 @@ export const KanbanCard: FC<KanbanCardProps> = memo(({
   className,
   testId,
   useOwnStyles = false,
+  theme = "light",
 }) => {
   const styles = useOwnStyles
     ? ({} as typeof kanbanBoardStyles)
@@ -55,7 +57,7 @@ export const KanbanCard: FC<KanbanCardProps> = memo(({
       data-card-status={card.status}
       data-card-index={index}
       className={cn(
-        styles.card,
+        useOwnStyles ? "" : (theme === "dark" ? "kanbanui-card-dark" : styles.card),
         "kanban-card",
         isGhostCard &&
           "opacity-50 border-2 border-dashed border-blue-400 bg-blue-50",
@@ -68,10 +70,10 @@ export const KanbanCard: FC<KanbanCardProps> = memo(({
     >
       <div className={styles.cardDropZone} />
 
-      <div className={styles.cardTitle}>{card.title}</div>
+      <div className={useOwnStyles ? "" : (theme === "dark" ? "kanbanui-card-title-dark" : styles.cardTitle)}>{card.title}</div>
       
       {card.description && (
-        <div className={styles.cardDescription}>{card.description}</div>
+        <div className={useOwnStyles ? "" : (theme === "dark" ? "kanbanui-card-description-dark" : styles.cardDescription)}>{card.description}</div>
       )}
 
       <div className={cn(styles.priorityBadge, priorityColors[card.priority])}>

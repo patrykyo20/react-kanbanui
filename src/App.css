@@ -1,0 +1,14 @@
+/* App.css - Basic styles for testing */
+.App {
+  padding: 20px;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+}
+
+/* Test styles */
+.test-box {
+  width: 40px;
+  height: 40px;
+  background-color: red;
+  margin-bottom: 16px;
+}

@@ -10,6 +10,7 @@ interface KanbanColumnProps {
   testId?: string;
   useOwnStyles?: boolean;
   columnHeight?: string;
+  theme?: "light" | "dark";
   isDragging?: boolean;
   draggedCardId?: string | null;
   isDropTarget?: boolean;
@@ -29,6 +30,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = memo(({
   onDragLeave,
   useOwnStyles = false,
   columnHeight = "600px",
+  theme = "light",
   isDragging = false,
   draggedCardId = null,
   isDropTarget = false,
@@ -38,14 +40,17 @@ export const KanbanColumn: FC<KanbanColumnProps> = memo(({
     : kanbanBoardStyles;
 
   const columnClasses = useMemo(
-    () =>
-      cn(
-        styles.column,
+    () => {
+      if (useOwnStyles) return className;
+      const themeClass = theme === "dark" ? "kanbanui-column-dark" : styles.column;
+      return cn(
+        themeClass,
         isDragging && "transition-all duration-200",
         isDropTarget && "border-blue-400 shadow-md scale-[1.02] bg-blue-50",
         className
-      ),
-    [styles.column, isDragging, isDropTarget, className]
+      );
+    },
+    [styles.column, useOwnStyles, theme, isDragging, isDropTarget, className]
   );
 
   const dropZoneClasses = useMemo(
@@ -72,6 +77,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = memo(({
             columnId={column.id}
             testId={`card-${card.id}`}
             useOwnStyles={useOwnStyles}
+            theme={theme}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             className={cn(
@@ -82,7 +88,7 @@ export const KanbanColumn: FC<KanbanColumnProps> = memo(({
           />
         );
       }),
-    [column.cards, column.id, draggedCardId, useOwnStyles, onDragStart, onDragEnd]
+    [column.cards, column.id, draggedCardId, useOwnStyles, theme, onDragStart, onDragEnd]
   );
 
   const emptyState = useMemo(
@@ -118,8 +124,8 @@ export const KanbanColumn: FC<KanbanColumnProps> = memo(({
       onDragLeave={onDragLeave}
       onDrop={onDragEnd}
     >
-      <div className={styles.columnHeader}>
-        <h3 className={styles.columnTitle}>
+      <div className={useOwnStyles ? "" : (theme === "dark" ? "kanbanui-column-header-dark" : styles.columnHeader)}>
+        <h3 className={useOwnStyles ? "" : (theme === "dark" ? "kanbanui-column-title-dark" : styles.columnTitle)}>
           {column.title}
           <span className={styles.columnCount}>{column.cards.length}</span>
         </h3>

@@ -3,7 +3,6 @@ import { kanbanBoardStyles } from "./KanbanBoard.styles";
 import { KanbanColumn } from "../KanbanColumn/KanbanColumn";
 import { useKanbanBoard } from "./useKanbanBoard";
 import { cn } from "../../utils/cn";
-import "./KanbanBoard.css";
 
 export interface IKanbanCard {
   id: string;
@@ -31,6 +30,7 @@ export interface IKanbanBoard {
   className?: string;
   useOwnStyles?: boolean;
   columnHeight?: string;
+  theme?: "light" | "dark";
   onColumnsChange?: (columns: IKanbanColumn[]) => void;
 }
 
@@ -40,6 +40,7 @@ export const KanbanBoard: FC<IKanbanBoard> = memo(
     className = "",
     useOwnStyles = false,
     columnHeight = "600px",
+    theme = "light",
     onColumnsChange,
   }) => {
     const {
@@ -57,10 +58,14 @@ export const KanbanBoard: FC<IKanbanBoard> = memo(
       ? ({} as typeof kanbanBoardStyles)
       : kanbanBoardStyles;
 
-    const boardClasses = useMemo(
-      () => cn(styles.board, className),
-      [styles.board, className]
-    );
+  const boardClasses = useMemo(
+    () => {
+      if (useOwnStyles) return className;
+      const themeClass = theme === "dark" ? "kanbanui-board-dark" : styles.board;
+      return cn(themeClass, className);
+    },
+    [styles.board, className, useOwnStyles, theme]
+  );
 
     const renderColumn = useCallback(
       (column: IKanbanColumn) => (
@@ -74,6 +79,7 @@ export const KanbanBoard: FC<IKanbanBoard> = memo(
           testId={`column-${column.id}`}
           useOwnStyles={useOwnStyles}
           columnHeight={columnHeight}
+          theme={theme}
           isDragging={isDragging}
           draggedCardId={draggedCardId}
           isDropTarget={isDragging && nextColumnId === column.id}
@@ -86,6 +92,7 @@ export const KanbanBoard: FC<IKanbanBoard> = memo(
         onDragEnd,
         useOwnStyles,
         columnHeight,
+        theme,
         isDragging,
         draggedCardId,
         nextColumnId,

@@ -37,9 +37,27 @@ export default [
         exclude: ["node_modules/**"],
       }),
       postcss({
-        modules: true,
-        extract: false,
+        modules: false,
+        extract: true,
         minimize: true,
+      }),
+    ],
+    external: ["react", "react-dom"],
+  },
+  {
+    input: "src/index.ts",
+    output: {
+      file: packageJson.types,
+      format: "esm",
+    },
+    plugins: [
+      dts({
+        exclude: ["**/*.css"],
+        compilerOptions: {
+          allowJs: true,
+          declaration: true,
+          emitDeclarationOnly: true,
+        },
       }),
     ],
     external: ["react", "react-dom"],

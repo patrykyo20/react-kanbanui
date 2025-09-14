@@ -1,6 +1,6 @@
 {
-  "name": "kanbanui",
-  "private": true,
+  "name": "react-kanbanui",
+  "private": false,
   "description": "A modern, high-performance React Kanban board component with drag-and-drop functionality",
   "main": "dist/cjs/index.js",
   "keywords": [
@@ -16,9 +16,11 @@
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src/index.css",
+    "src/styles.ts"
   ],
-  "version": "1.0.0",
+  "version": "1.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -26,10 +28,10 @@
     "build:watch": "rollup -c -w",
     "preview": "vite preview",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.12",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "rollup-plugin-dts": "^6.2.3",
@@ -40,6 +42,7 @@
     "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
+    "@tailwindcss/vite": "^4.1.13",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",

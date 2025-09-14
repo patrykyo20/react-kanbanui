@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+/* KanbanUI Default Styles */
+.kanbanui-board {
+  @apply min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6;
+}
+
+.kanbanui-board-dark {
+  @apply min-h-screen bg-gradient-to-br from-slate-900 to-blue-900 p-6;
+}
+
+.kanbanui-container {
+  @apply max-w-7xl mx-auto;
+}
+
+.kanbanui-columns {
+  @apply flex gap-6 overflow-x-auto pb-4;
+}
+
+.kanbanui-column {
+  @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 flex flex-col min-w-64 flex-shrink-0;
+}
+
+.kanbanui-column-dark {
+  @apply bg-slate-800 rounded-xl shadow-sm border border-slate-600 overflow-hidden transition-all duration-300 flex flex-col min-w-64 flex-shrink-0;
+}
+
+.kanbanui-column:hover {
+  @apply shadow-md;
+}
+
+.kanbanui-column-header {
+  @apply px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200;
+}
+
+.kanbanui-column-header-dark {
+  @apply px-4 py-3 bg-gradient-to-r from-slate-700 to-slate-800 border-b border-slate-600;
+}
+
+.kanbanui-column-title {
+  @apply text-lg font-semibold text-gray-800;
+}
+
+.kanbanui-column-title-dark {
+  @apply text-lg font-semibold text-gray-100;
+}
+
+.kanbanui-column-count {
+  @apply ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full;
+}
+
+.kanbanui-dropzone {
+  @apply flex-1 p-4 bg-gradient-to-b from-gray-50 to-white relative border-1 border-white overflow-y-auto;
+}
+
+.kanbanui-dropzone-drag-over {
+  @apply bg-blue-100 border-1 border-dashed border-blue-400;
+}
+
+.kanbanui-card {
+  @apply mb-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-sm transition-all duration-300 cursor-move hover:border-blue-300 relative;
+}
+
+.kanbanui-card-dark {
+  @apply mb-3 p-3 bg-slate-700 rounded-lg border border-slate-600 shadow-sm hover:shadow-sm transition-all duration-300 cursor-move hover:border-blue-400 relative;
+}
+
+.kanbanui-card:hover {
+  @apply shadow-sm;
+}
+
+.kanbanui-card-title {
+  @apply font-medium text-gray-900 text-sm mb-1;
+}
+
+.kanbanui-card-title-dark {
+  @apply font-medium text-gray-100 text-sm mb-1;
+}
+
+.kanbanui-card-description {
+  @apply text-xs text-gray-600 mb-2 line-clamp-2;
+}
+
+.kanbanui-card-description-dark {
+  @apply text-xs text-gray-300 mb-2 line-clamp-2;
+}
+
+.kanbanui-priority-urgent {
+  @apply bg-red-100 text-red-800;
+}
+
+.kanbanui-priority-high {
+  @apply bg-orange-100 text-orange-800;
+}
+
+.kanbanui-priority-medium {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.kanbanui-priority-low {
+  @apply bg-green-100 text-green-800;
+}
+
+.kanbanui-assignee {
+  @apply flex items-center mt-2 text-xs text-gray-500;
+}
+
+.kanbanui-assignee-icon {
+  @apply w-4 h-4 mr-1 text-gray-400;
+}
+
+/* Drag and Drop Animations */
+.kanbanui-card-dragging {
+  opacity: 0.5;
+  transition: all 0.3s ease-in-out;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kanbanui-card-moving-up {
+  animation: kanbanui-slideUp 0.4s ease-out;
+}
+
+.kanbanui-card-moving-down {
+  animation: kanbanui-slideDown 0.4s ease-out;
+}
+
+.kanbanui-card-receiving {
+  animation: kanbanui-pulse 0.3s ease-in-out;
+}
+
+.kanbanui-card-entering {
+  animation: kanbanui-cardEnter 0.4s ease-out;
+}
+
+.kanbanui-cards-shifting {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kanbanui-column-drag-over {
+  animation: kanbanui-columnPulse 0.6s ease-in-out infinite alternate;
+}
+
+/* Keyframe animations */
+@keyframes kanbanui-slideUp {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes kanbanui-slideDown {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes kanbanui-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
+  }
+}
+
+@keyframes kanbanui-cardEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes kanbanui-columnPulse {
+  0% {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+  }
+  100% {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.18);
+  }
+}
