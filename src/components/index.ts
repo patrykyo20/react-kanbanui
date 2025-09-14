@@ -1,3 +1,5 @@
-export * from './KanbanBoard';
-export { KanbanCard } from './KanbanCard';
-export { KanbanColumn } from './KanbanColumn';
+export { KanbanBoard } from "./KanbanBoard/KanbanBoard";
+export { KanbanColumn } from "./KanbanColumn/KanbanColumn";
+export { KanbanCard } from "./KanbanCard/KanbanCard";
+
+export type { IKanbanBoard, IKanbanColumn, IKanbanCard } from "./KanbanBoard/KanbanBoard";

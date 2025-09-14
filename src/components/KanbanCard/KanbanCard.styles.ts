@@ -1,5 +1,5 @@
 export const kanbanCardStyles = {
-  card: "group relative bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden",
+  card: "group relative bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden",
   cardHover: "hover:border-blue-300 hover:scale-[1.02]",
   
   cardContent: "p-4",
@@ -40,12 +40,12 @@ export const cardVariants = {
   default: {
     shadow: "shadow-sm",
     border: "border-gray-200",
-    hover: "hover:shadow-md hover:border-blue-300",
+    hover: "hover:shadow-sm hover:border-blue-300",
   },
   elevated: {
     shadow: "shadow-md",
     border: "border-gray-300",
-    hover: "hover:shadow-lg hover:border-blue-400",
+    hover: "hover:shadow-md hover:border-blue-400",
   },
   minimal: {
     shadow: "shadow-none",
@@ -102,13 +102,13 @@ export const cardColorSchemes = {
 export const animationPresets = {
   hover: {
     scale: "hover:scale-[1.02]",
-    shadow: "hover:shadow-lg",
+    shadow: "hover:shadow-md",
     border: "hover:border-blue-300",
     transition: "transition-all duration-200",
   },
   focus: {
     scale: "focus:scale-[1.01]",
-    shadow: "focus:shadow-md",
+    shadow: "focus:shadow-sm",
     border: "focus:border-blue-400",
     ring: "focus:ring-2 focus:ring-blue-200",
   },

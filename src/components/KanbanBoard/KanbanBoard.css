@@ -1,29 +1,22 @@
-/* ✅ Drop zone styles for visual feedback */
-
-/* Drop zones on cards */
-
 .card-dragging {
-  opacity: 0.5 !important;
-  transition: all 0.3s ease-in-out !important;
-  z-index: 100 !important;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  opacity: 0.5;
+  transition: all 0.3s ease-in-out;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Cards that will move to make space */
 .card-moving-up {
-  animation: slideUp 0.4s ease-out !important;
+  animation: slideUp 0.4s ease-out;
 }
 
 .card-moving-down {
-  animation: slideDown 0.4s ease-out !important;
+  animation: slideDown 0.4s ease-out;
 }
 
-/* Card that will receive the dropped card */
 .card-receiving {
-  animation: pulse 0.3s ease-in-out !important;
+  animation: pulse 0.3s ease-in-out;
 }
 
-/* ✅ Keyframe animations */
 
 @keyframes slideUp {
   0% {
@@ -52,27 +45,25 @@
 @keyframes pulse {
   0% {
     transform: scale(1);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
   }
   50% {
     transform: scale(1.02);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
   }
 }
 
-/* ✅ Smooth card reordering transitions */
 .kanban-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  will-change: transform, opacity !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
 }
 
-/* Card entering new position */
 .card-entering {
-  animation: cardEnter 0.4s ease-out !important;
+  animation: cardEnter 0.4s ease-out;
 }
 
 @keyframes cardEnter {
@@ -86,30 +77,27 @@
   }
 }
 
-/* Cards shifting to make space */
 .cards-shifting {
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ✅ Enhanced hover effects during drag */
 .kanban-card:hover:not(.card-dragging) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1) !important;
-  transition: all 0.2s ease-out !important;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease-out;
 }
 
-/* ✅ Column animation during drag over */
 .column-drag-over {
-  animation: columnPulse 0.6s ease-in-out infinite alternate !important;
+  animation: columnPulse 0.6s ease-in-out infinite alternate;
 }
 
 @keyframes columnPulse {
   0% {
     transform: scale(1.02);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
   }
   100% {
     transform: scale(1.02);
-    box-shadow: 0 12px 35px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.18);
   }
 }

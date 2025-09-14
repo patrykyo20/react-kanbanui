@@ -1,15 +1,5 @@
-export const hello = () => {
-  return "hello";
-};
+export { KanbanBoard } from "./components/KanbanBoard/KanbanBoard";
+export { KanbanColumn } from "./components/KanbanColumn/KanbanColumn";
+export { KanbanCard } from "./components/KanbanCard/KanbanCard";
 
-export const goodbye = () => {
-  return "goodbye";
-};
-
-export const sum = (a: number, b: number) => {
-  return a + b;
-};
-
-export const subtract = (a: number, b: number) => {
-  return a - b;
-};
+export type { IKanbanBoard, IKanbanColumn, IKanbanCard } from "./components/KanbanBoard/KanbanBoard";

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, memo, useCallback, DragEvent } from "react";
 import { IKanbanCard } from "../KanbanBoard/KanbanBoard";
 import {
   kanbanBoardStyles,
@@ -13,11 +13,11 @@ interface KanbanCardProps {
   className?: string;
   testId?: string;
   useOwnStyles?: boolean;
-  onDragStart?: (event: React.DragEvent<HTMLDivElement>) => void;
-  onDragEnd?: (event: React.DragEvent<HTMLDivElement>) => void;
+  onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragEnd?: (event: DragEvent<HTMLDivElement>) => void;
 }
 
-export const KanbanCard: FC<KanbanCardProps> = ({
+export const KanbanCard: FC<KanbanCardProps> = memo(({
   card,
   index,
   onDragStart,
@@ -26,37 +26,50 @@ export const KanbanCard: FC<KanbanCardProps> = ({
   testId,
   useOwnStyles = false,
 }) => {
-  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-    event.dataTransfer.setData("text/plain", card.id);
-    onDragStart?.(event);
-  };
   const styles = useOwnStyles
     ? ({} as typeof kanbanBoardStyles)
     : kanbanBoardStyles;
 
   const isGhostCard = card.id.endsWith("-ghost");
 
+  const handleDragStart = useCallback(
+    (event: DragEvent<HTMLDivElement>) => {
+      event.dataTransfer.setData("text/plain", card.id);
+      event.dataTransfer.effectAllowed = "move";
+      onDragStart?.(event);
+    },
+    [card.id, onDragStart]
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEvent<HTMLDivElement>) => {
+      event.dataTransfer.clearData();
+      onDragEnd?.(event);
+    },
+    [onDragEnd]
+  );
+
   return (
     <div
-      key={card.id}
       data-card-id={card.id}
       data-card-status={card.status}
       data-card-index={index}
       className={cn(
-        styles.card, 
+        styles.card,
         "kanban-card",
-        isGhostCard && "opacity-50 border-2 border-dashed border-blue-400 bg-blue-50",
+        isGhostCard &&
+          "opacity-50 border-2 border-dashed border-blue-400 bg-blue-50",
         className
       )}
       draggable={!isGhostCard}
       onDragStart={handleDragStart}
-      onDragEnd={onDragEnd}
+      onDragEnd={handleDragEnd}
       data-testid={testId}
     >
-      {/* Drop zone indicators - tylko gdy potrzebne */}
       <div className={styles.cardDropZone} />
 
       <div className={styles.cardTitle}>{card.title}</div>
+      
       {card.description && (
         <div className={styles.cardDescription}>{card.description}</div>
       )}
@@ -81,6 +94,21 @@ export const KanbanCard: FC<KanbanCardProps> = ({
           {card.assignee}
         </div>
       )}
+
+      {card.tags && card.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {card.tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
-};
+});
+
+KanbanCard.displayName = "KanbanCard";

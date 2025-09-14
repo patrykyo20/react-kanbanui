@@ -1,9 +1,10 @@
+import { FC, memo, useMemo, useCallback } from "react";
 import { kanbanBoardStyles } from "./KanbanBoard.styles";
 import { KanbanColumn } from "../KanbanColumn/KanbanColumn";
-import "./KanbanBoard.css";
 import { useKanbanBoard } from "./useKanbanBoard";
+import { cn } from "../../utils/cn";
+import "./KanbanBoard.css";
 
-// ✅ Interfejsy zgodne z regułami
 export interface IKanbanCard {
   id: string;
   title: string;
@@ -33,49 +34,77 @@ export interface IKanbanBoard {
   onColumnsChange?: (columns: IKanbanColumn[]) => void;
 }
 
-export const KanbanBoard: React.FC<IKanbanBoard> = ({
-  columns,
-  className = "",
-  useOwnStyles = false,
-  columnHeight = "600px",
-  onColumnsChange,
-}) => {
-  const {
-    columns: updatedColumns,
-    isDragging,
-    draggedCardId,
-    nextColumnId,
-    onDragStart,
-    onDragOver,
-    onDragLeave,
-    onDragEnd,
-  } = useKanbanBoard(columns, onColumnsChange);
-  const styles = useOwnStyles
-    ? ({} as typeof kanbanBoardStyles)
-    : kanbanBoardStyles;
+export const KanbanBoard: FC<IKanbanBoard> = memo(
+  ({
+    columns,
+    className = "",
+    useOwnStyles = false,
+    columnHeight = "600px",
+    onColumnsChange,
+  }) => {
+    const {
+      columns: processedColumns,
+      isDragging,
+      draggedCardId,
+      nextColumnId,
+      onDragStart,
+      onDragOver,
+      onDragLeave,
+      onDragEnd,
+    } = useKanbanBoard(columns, onColumnsChange);
 
-  return (
-    <div className={`${styles.board || ""} ${className}`}>
-      <div className={styles.boardContainer || ""}>
-        <div className={styles.columnsGrid || ""}>
-          {updatedColumns?.map((column) => (
-            <KanbanColumn
-              key={column.id}
-              column={column}
-              onDragStart={onDragStart}
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              onDragEnd={onDragEnd}
-              testId={`column-${column.id}`}
-              useOwnStyles={useOwnStyles}
-              columnHeight={columnHeight}
-              isDragging={isDragging}
-              draggedCardId={draggedCardId}
-              isDropTarget={isDragging && nextColumnId === column.id}
-            />
-          ))}
+    const styles = useOwnStyles
+      ? ({} as typeof kanbanBoardStyles)
+      : kanbanBoardStyles;
+
+    const boardClasses = useMemo(
+      () => cn(styles.board, className),
+      [styles.board, className]
+    );
+
+    const renderColumn = useCallback(
+      (column: IKanbanColumn) => (
+        <KanbanColumn
+          key={column.id}
+          column={column}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDragEnd={onDragEnd}
+          testId={`column-${column.id}`}
+          useOwnStyles={useOwnStyles}
+          columnHeight={columnHeight}
+          isDragging={isDragging}
+          draggedCardId={draggedCardId}
+          isDropTarget={isDragging && nextColumnId === column.id}
+        />
+      ),
+      [
+        onDragStart,
+        onDragOver,
+        onDragLeave,
+        onDragEnd,
+        useOwnStyles,
+        columnHeight,
+        isDragging,
+        draggedCardId,
+        nextColumnId,
+      ]
+    );
+
+    const renderedColumns = useMemo(
+      () => processedColumns?.map(renderColumn) ?? [],
+      [processedColumns, renderColumn]
+    );
+
+    return (
+      <div className={boardClasses}>
+        <div>
+          <div className={styles.columnsGrid}>{renderedColumns}</div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
+
+KanbanBoard.displayName = "KanbanBoard";

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, memo, useMemo, DragEvent } from "react";
 import { IKanbanColumn } from "../KanbanBoard/KanbanBoard";
 import { KanbanCard } from "../KanbanCard/KanbanCard";
 import { kanbanBoardStyles } from "../KanbanBoard/KanbanBoard.styles";
@@ -13,13 +13,13 @@ interface KanbanColumnProps {
   isDragging?: boolean;
   draggedCardId?: string | null;
   isDropTarget?: boolean;
-  onDragStart?: (event: React.DragEvent<HTMLDivElement>) => void;
-  onDragOver?: (event: React.DragEvent<HTMLDivElement>) => void;
-  onDragLeave?: (event: React.DragEvent<HTMLDivElement>) => void;
-  onDragEnd?: (event: React.DragEvent<HTMLDivElement>) => void;
+  onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragOver?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragLeave?: (event: DragEvent<HTMLDivElement>) => void;
+  onDragEnd?: (event: DragEvent<HTMLDivElement>) => void;
 }
 
-export const KanbanColumn: FC<KanbanColumnProps> = ({
+export const KanbanColumn: FC<KanbanColumnProps> = memo(({
   column,
   className,
   testId,
@@ -37,16 +37,79 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
     ? ({} as typeof kanbanBoardStyles)
     : kanbanBoardStyles;
 
+  const columnClasses = useMemo(
+    () =>
+      cn(
+        styles.column,
+        isDragging && "transition-all duration-200",
+        isDropTarget && "border-blue-400 shadow-md scale-[1.02] bg-blue-50",
+        className
+      ),
+    [styles.column, isDragging, isDropTarget, className]
+  );
+
+  const dropZoneClasses = useMemo(
+    () =>
+      cn(
+        styles.dropZone,
+        "relative",
+        isDropTarget && "bg-blue-100 border-2 border-dashed border-blue-400"
+      ),
+    [styles.dropZone, isDropTarget]
+  );
+
+  const renderedCards = useMemo(
+    () =>
+      column.cards.map((card, index) => {
+        const isGhostCard = card.id.endsWith("-ghost");
+        const isBeingDragged = draggedCardId === card.id;
+
+        return (
+          <KanbanCard
+            key={card.id}
+            card={card}
+            index={index}
+            columnId={column.id}
+            testId={`card-${card.id}`}
+            useOwnStyles={useOwnStyles}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+            className={cn(
+              isGhostCard &&
+                "opacity-50 border-2 border-dashed border-blue-400 bg-blue-50",
+              isBeingDragged && "card-dragging"
+            )}
+          />
+        );
+      }),
+    [column.cards, column.id, draggedCardId, useOwnStyles, onDragStart, onDragEnd]
+  );
+
+  const emptyState = useMemo(
+    () => (
+      <div className={styles.emptyState}>
+        <svg
+          className="mx-auto h-8 w-8 text-gray-300 mb-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+          />
+        </svg>
+        <span>No cards yet</span>
+      </div>
+    ),
+    [styles.emptyState]
+  );
 
   return (
     <div
-      key={column.id}
-      className={cn(
-        styles.column,
-        isDragging && "transition-all duration-200",
-        isDropTarget && "border-blue-400 shadow-xl scale-[1.02] bg-blue-50",
-        className
-      )}
+      className={columnClasses}
       style={{ height: columnHeight }}
       data-column-status={column.status}
       data-testid={testId}
@@ -63,58 +126,15 @@ export const KanbanColumn: FC<KanbanColumnProps> = ({
       </div>
 
       <div
-        className={cn(
-          styles.dropZone,
-          "relative",
-          isDropTarget && "bg-blue-100 border-2 border-dashed border-blue-400"
-        )}
+        className={dropZoneClasses}
         data-column-status={column.status}
       >
-        {column.cards.map((card, index) => {
-          const isGhostCard = card.id.endsWith("-ghost");
-          const isBeingDragged = draggedCardId === card.id;
+        {renderedCards}
 
-          return (
-            <div key={card.id}>
-              
-              <KanbanCard
-                card={card}
-                index={index}
-                columnId={column.id}
-                testId={`card-${card.id}`}
-                useOwnStyles={useOwnStyles}
-                onDragStart={onDragStart}
-                onDragEnd={onDragEnd}
-                className={cn(
-                  isGhostCard &&
-                    "opacity-50 border-2 border-dashed border-blue-400 bg-blue-50",
-                  isBeingDragged && "card-dragging"
-                )}
-              />
-            </div>
-          );
-        })}
-
-
-        {column.cards.length === 0 && !isDropTarget && (
-          <div className={styles.emptyState}>
-            <svg
-              className="mx-auto h-8 w-8 text-gray-300 mb-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-              />
-            </svg>
-            No cards yet
-          </div>
-        )}
+        {column.cards.length === 0 && !isDropTarget && emptyState}
       </div>
     </div>
   );
-};
+});
+
+KanbanColumn.displayName = "KanbanColumn";
